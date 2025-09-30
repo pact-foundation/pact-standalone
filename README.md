@@ -438,3 +438,13 @@ Commands:
 ### SSL
 
 To connect to a Pact Broker that uses custom SSL certificates, set the environment variable `$SSL_CERT_FILE` or `$SSL_CERT_DIR` to a path that contains the appropriate certificate.
+
+### error while loading shared libraries: libcrypt.so.1: cannot open shared object file: No such file or directory
+
+This error occurs because the bundled Ruby, on Linux, is built against `libcrypt.so.1`, and you're on a distro that has moved to `libcrypt.so.2`.
+
+To fix, install the `libxcrypt-compact` that corresponds with your distro:
+
+- **CentOS** / **RHEL** / **Fedora** - `sudo dnf install libxcrypt-compat`
+- **Arch Linux** - `sudo pacman -S libxcrypt-compat`
+- Others - search your package manager for a package that provides `libcrypt.so.1`
