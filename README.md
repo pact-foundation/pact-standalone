@@ -21,22 +21,24 @@ This version (2.5.5) of the Pact standalone executables package contains:
   * [pact-stub-server](https://github.com/pact-foundation/pact-stub-server)
   * [pact_verifier_cli](https://github.com/pact-foundation/pact-reference/tree/master/rust/pact_verifier_cli)
   * [pact-plugin-cli](https://github.com/pact-foundation/pact-plugins/tree/main/cli)
+  * [pact-broker-cli](https://github.com/pact-foundation/pact-broker-cli)
 
 Binaries will be extracted into `pact/bin`:
 
 ```
 ./pact/bin/
 ├── pact (central entry point to all binaries)
-├── pact-broker
-├── pactflow
+├── pact-broker-cli
 ├── pact_mock_server_cli
 ├── pact-stub-server
 ├── pact_verifier_cli
 ├── pact-plugin-cli
-├── pact-message (legacy)
-├── pact-mock-service (legacy)
-├── pact-provider-verifier (legacy)
-└── pact-stub-service (legacy)
+├── pact-broker (legacy) - use `pact-broker-cli`
+├── pactflow (legacy) - use `pact-broker-cli pactflow`
+├── pact-message (legacy) - use `pact_mock_server_cli` (consumer) / `pact_verifier_cli` (provider)
+├── pact-mock-service (legacy) - use `pact_mock_server_cli`
+├── pact-provider-verifier (legacy) - use `pact_verifier_cli`
+└── pact-stub-service (legacy) - use `pact-stub-server`
 ```
 
 ### Windows Users

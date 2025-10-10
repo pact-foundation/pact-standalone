@@ -73,20 +73,26 @@ when 'stub-server'
     exit_status = Process.wait2(io.pid)[1].exitstatus
     exit(exit_status)
   end
+when 'pact-broker-cli'
+  ARGV.shift
+  output = `#{File.expand_path("../../bin/pact-broker-cli", __dir__)} #{ARGV.join(" ")}`
+  exit_status = $?.exitstatus
+  puts output
+  exit(exit_status)
 else
   puts "available commands:"
   puts "__________________"
   puts "#{FILENAME} help"
-  puts "#{FILENAME} pact"
-  puts "#{FILENAME} pactflow"
-  puts "#{FILENAME} stub-server"
-  puts "#{FILENAME} verifier"
-  puts "#{FILENAME} mock-server"
-  puts "#{FILENAME} message"
-  puts "#{FILENAME} broker"
-  puts "#{FILENAME} pact-broker"
-  puts "#{FILENAME} plugin"
-  puts "#{FILENAME} stub-service (legacy)"
-  puts "#{FILENAME} provider-verifier (legacy)"
-  puts "#{FILENAME} mock-service (legacy)"
+  puts "#{FILENAME} pact (central entry point to all binaries)"
+  puts "#{FILENAME} pact-broker-cli"
+  puts "#{FILENAME} pact_mock_server_cli"
+  puts "#{FILENAME} pact-stub-server"
+  puts "#{FILENAME} pact_verifier_cli"
+  puts "#{FILENAME} pact-plugin-cli"
+  puts "#{FILENAME} pact-broker (legacy) - use `pact-broker-cli`"
+  puts "#{FILENAME} pactflow (legacy) - use `pact-broker-cli pactflow`"
+  puts "#{FILENAME} pact-message (legacy) - use `pact_mock_server_cli` (consumer) / `pact_verifier_cli` (provider)"
+  puts "#{FILENAME} pact-mock-service (legacy) - use `pact_mock_server_cli`"
+  puts "#{FILENAME} pact-provider-verifier (legacy) - use `pact_verifier_cli`"
+  puts "#{FILENAME} pact-stub-service (legacy) - use `pact-stub-server`"
 end

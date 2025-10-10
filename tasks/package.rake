@@ -13,6 +13,7 @@ PLUGIN_CLI_VERSION = "0.1.3" # https://github.com/pact-foundation/pact-plugins/r
 MOCK_SERVER_CLI_VERSION = "1.0.6" # https://github.com/pact-foundation/pact-core-mock-server/releases
 VERIFIER_CLI_VERSION = "1.2.0" # https://github.com/pact-foundation/pact-reference/releases
 STUB_SERVER_CLI_VERSION = "0.6.2" # https://github.com/pact-foundation/pact-stub-server/releases
+PACT_BROKER_CLI_VERSION = "0.1.0" # https://github.com/pact-foundation/pact-broker-cli/releases
 
 desc "Package pact-standalone for OSX, Linux x86_64 and windows x86_64"
 task :package => ['package:linux:x86_64','package:linux:arm64', 'package:osx:x86_64', 'package:osx:arm64','package:windows:x86_64']
@@ -136,6 +137,7 @@ def create_package(version, source_target, package_target, os_type)
   install_mock_server_cli package_dir, package_target
   install_verifier_cli package_dir, package_target
   install_stub_server_cli package_dir, package_target
+  install_broker_cli package_dir, package_target
 
   if !ENV['DIR_ONLY']
     sh "mkdir -p pkg"
@@ -337,5 +339,25 @@ def install_stub_server_cli(package_dir, package_target)
     sh "curl -L -o #{package_dir}/bin/pact-stub-server.exe.gz https://github.com/pact-foundation/pact-stub-server/releases/download/v#{STUB_SERVER_CLI_VERSION}/pact-stub-server-windows-x86_64.exe.gz"
     sh "gunzip -N -f #{package_dir}/bin/pact-stub-server.exe.gz"
     sh "chmod +x #{package_dir}/bin/pact-stub-server.exe"
+  end
+end
+
+def install_broker_cli(package_dir, package_target)
+  case package_target
+  when "linux-x86_64"
+    sh "curl -L -o #{package_dir}/bin/pact-broker-cli https://github.com/pact-foundation/pact-broker-cli/releases/download/v#{PACT_BROKER_CLI_VERSION}/pact-broker-cli-x86_64-linux-musl"
+    sh "chmod +x #{package_dir}/bin/pact-broker-cli"
+  when "linux-arm64"
+    sh "curl -L -o #{package_dir}/bin/pact-broker-cli https://github.com/pact-foundation/pact-broker-cli/releases/download/v#{PACT_BROKER_CLI_VERSION}/pact-broker-cli-aarch64-linux"
+    sh "chmod +x #{package_dir}/bin/pact-broker-cli"
+  when "osx-x86_64"
+    sh "curl -L -o #{package_dir}/bin/pact-broker-cli https://github.com/pact-foundation/pact-broker-cli/releases/download/v#{PACT_BROKER_CLI_VERSION}/pact-broker-cli-x86_64-macos"
+    sh "chmod +x #{package_dir}/bin/pact-broker-cli"
+  when "osx-arm64"
+    sh "curl -L -o #{package_dir}/bin/pact-broker-cli https://github.com/pact-foundation/pact-broker-cli/releases/download/v#{PACT_BROKER_CLI_VERSION}/pact-broker-cli-aarch64-macos"
+    sh "chmod +x #{package_dir}/bin/pact-broker-cli"
+  when "windows-x86_64"
+    sh "curl -L -o #{package_dir}/bin/pact-broker-cli.exe https://github.com/pact-foundation/pact-broker-cli/releases/download/v#{PACT_BROKER_CLI_VERSION}/pact-broker-cli-x86_64-windows-gnu.exe"
+    sh "chmod +x #{package_dir}/bin/pact-broker-cli.exe"
   end
 end
