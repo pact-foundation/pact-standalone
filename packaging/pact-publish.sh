@@ -15,6 +15,14 @@ done
 RDIR="$( dirname "$SOURCE" )"
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
+if [ -z "${PACT_CLI_LEGACY}" ]; then
+  APP="$DIR/pact-broker-cli publish"
+  if [ -x "$APP" ]; then
+    exec "$APP" "$@"
+    exit $?
+  fi
+fi
+
 # Figure out where this script is located.
 LIBDIR="$(cd "$DIR" && cd ../lib && pwd)"
 

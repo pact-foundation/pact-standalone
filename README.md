@@ -41,6 +41,14 @@ Binaries will be extracted into `pact/bin`:
 └── pact-stub-service (legacy) - use `pact-stub-server`
 ```
 
+Note: from `v2.6.0+`, the legacy commands will redirect to the new cli executables built in rust.
+
+Existing behaviour can be preserved by setting the `PACT_CLI_LEGACY` environment variable.
+
+In `v3.0.0`, the ruby runtime will be removed completely, and all commands will link to the rust executables.
+
+Longer term, this package is likely to be deprecated, replaced with a single `pact` cli executable.
+
 ### Windows Users
 
 Please append `.bat` to any of the provided ruby-based binaries
@@ -77,8 +85,13 @@ Ruby is not required on the host platform, Ruby 3.3.9 is provided in the distrib
 | Linux  | 3.3.9     | aarch64 (arm64)| ✅        |
 | Windows| 3.3.9     | x86_64         | ✅        |
 | Windows| 3.3.9     | aarch64 (arm64)| 🚧        |
+| Windows| N/A.      | aarch64 (arm64)| ✅        |
 
 🚧 - Tested under emulation mode x86_64 in Windows on ARM
+
+Windows-arm64 package supports rust based executables only and does not provide an arm64 runtime currently.
+
+To use ruby packages on windows on arm, please use the x86_64 package.
 
 ## Usage
 

@@ -13,10 +13,10 @@ PLUGIN_CLI_VERSION = "0.1.3" # https://github.com/pact-foundation/pact-plugins/r
 MOCK_SERVER_CLI_VERSION = "1.0.6" # https://github.com/pact-foundation/pact-core-mock-server/releases
 VERIFIER_CLI_VERSION = "1.2.0" # https://github.com/pact-foundation/pact-reference/releases
 STUB_SERVER_CLI_VERSION = "0.6.2" # https://github.com/pact-foundation/pact-stub-server/releases
-PACT_BROKER_CLI_VERSION = "0.1.0" # https://github.com/pact-foundation/pact-broker-cli/releases
+PACT_BROKER_CLI_VERSION = "0.2.0" # https://github.com/pact-foundation/pact-broker-cli/releases
 
 desc "Package pact-standalone for OSX, Linux x86_64 and windows x86_64"
-task :package => ['package:linux:x86_64','package:linux:arm64', 'package:osx:x86_64', 'package:osx:arm64','package:windows:x86_64']
+task :package => ['package:linux:x86_64','package:linux:arm64', 'package:osx:x86_64', 'package:osx:arm64','package:windows:x86_64', 'package:windows:arm64']
 
 namespace :package do
   namespace :linux do
@@ -48,10 +48,16 @@ namespace :package do
       create_package(TRAVELING_RUBY_VERSION, "windows-x86_64", "windows-x86_64", :windows)
     end
   end
+  namespace :windows do
+    desc "Package pact-standalone for windows arm64"
+    task :arm64 do
+      create_package(TRAVELING_RUBY_VERSION, "windows-arm64", "windows-arm64", :windows)
+    end
+  end
   desc "Install gems to local directory"
   task :bundle_install do
     if RUBY_VERSION !~ /^#{RUBY_MAJOR_VERSION}\.#{RUBY_MINOR_VERSION}\./
-      abort "You can only 'bundle install' using Ruby #{RUBY_VERSION}, because that's what Traveling Ruby uses."
+      abort "You can only 'bundle install' using Ruby #{TRAVELING_RB_VERSION}, because that's what Traveling Ruby uses. \n You are using Ruby #{RUBY_VERSION}."
     end
     sh "rm -rf build/tmp"
     sh "mkdir -p build/tmp"
@@ -107,7 +113,11 @@ def create_package(version, source_target, package_target, os_type)
 
   # sh "cp -pR lib #{package_dir}/lib/app"
   sh "mkdir #{package_dir}/lib/ruby"
-  sh "tar -xzf build/traveling-ruby-#{version}-#{source_target}.tar.gz -C #{package_dir}/lib/ruby"
+  if package_target == "windows-arm64"
+    sh "mkdir -p #{package_dir}/lib/ruby/lib"
+  else
+    sh "tar -xzf build/traveling-ruby-#{version}-#{source_target}.tar.gz -C #{package_dir}/lib/ruby"
+  end
   # From https://curl.se/docs/caextract.html
   sh "cp packaging/cacert.pem #{package_dir}/lib/ruby/lib/ca-bundle.crt"
 
@@ -121,18 +131,21 @@ def create_package(version, source_target, package_target, os_type)
   else
     raise "We don't serve their kind (#{os_type}) here!"
   end
-
-  sh "cp -pR build/vendor #{package_dir}/lib/"
-  sh "cp packaging/Gemfile packaging/Gemfile.lock #{package_dir}/lib/vendor/"
-  sh "mkdir #{package_dir}/lib/vendor/.bundle"
-  sh "cp packaging/bundler-config #{package_dir}/lib/vendor/.bundle/config"
-
-  if package_target.include? 'windows'
-    sh "sed -i.bak '37s/^/#/' #{package_dir}/lib/ruby/lib/ruby/#{RUBY_COMPAT_VERSION}/bundler/stub_specification.rb"
-  else
-    sh "sed -i.bak '41s/^/#/' #{package_dir}/lib/ruby/lib/ruby/site_ruby/#{RUBY_COMPAT_VERSION}/bundler/stub_specification.rb"
+  unless package_target == "windows-arm64"
+    sh "cp -pR build/vendor #{package_dir}/lib/"
+    sh "cp packaging/Gemfile packaging/Gemfile.lock #{package_dir}/lib/vendor/"
+    sh "mkdir #{package_dir}/lib/vendor/.bundle"
+    sh "cp packaging/bundler-config #{package_dir}/lib/vendor/.bundle/config"
   end
+  unless package_target == "windows-arm64"
+
+    if package_target.include? 'windows'
+      sh "sed -i.bak '37s/^/#/' #{package_dir}/lib/ruby/lib/ruby/#{RUBY_COMPAT_VERSION}/bundler/stub_specification.rb"
+    else
+      sh "sed -i.bak '41s/^/#/' #{package_dir}/lib/ruby/lib/ruby/site_ruby/#{RUBY_COMPAT_VERSION}/bundler/stub_specification.rb"
+    end
   remove_unnecessary_files package_dir
+  end
   install_plugin_cli package_dir, package_target
   install_mock_server_cli package_dir, package_target
   install_verifier_cli package_dir, package_target
@@ -148,7 +161,7 @@ def create_package(version, source_target, package_target, os_type)
     sh "zip -9rq pkg/#{package_name}.zip #{package_dir}"
   end
 
-  sh "rm -rf #{package_dir}"
+  # sh "rm -rf #{package_dir}"
   end
 end
 
@@ -264,6 +277,10 @@ def install_plugin_cli(package_dir, package_target)
     sh "curl -L -o #{package_dir}/bin/pact-plugin-cli.exe.gz https://github.com/pact-foundation/pact-plugins/releases/download/pact-plugin-cli-v#{PLUGIN_CLI_VERSION}/pact-plugin-cli-windows-x86_64.exe.gz"
     sh "gunzip -N -f #{package_dir}/bin/pact-plugin-cli.exe.gz"
     sh "chmod +x #{package_dir}/bin/pact-plugin-cli.exe"
+  when "windows-arm64"
+    sh "curl -L -o #{package_dir}/bin/pact-plugin-cli.exe.gz https://github.com/pact-foundation/pact-plugins/releases/download/pact-plugin-cli-v#{PLUGIN_CLI_VERSION}/pact-plugin-cli-windows-aarch64.exe.gz"
+    sh "gunzip -N -f #{package_dir}/bin/pact-plugin-cli.exe.gz"
+    sh "chmod +x #{package_dir}/bin/pact-plugin-cli.exe"
   end
 end
 
@@ -287,6 +304,10 @@ def install_mock_server_cli(package_dir, package_target)
     sh "chmod +x #{package_dir}/bin/pact_mock_server_cli"
   when "windows-x86_64"
     sh "curl -L -o #{package_dir}/bin/pact_mock_server_cli.exe.gz https://github.com/pact-foundation/pact-core-mock-server//releases/download/pact_mock_server_cli-v#{MOCK_SERVER_CLI_VERSION}/pact_mock_server_cli-windows-x86_64.exe.gz"
+    sh "gunzip -N -f #{package_dir}/bin/pact_mock_server_cli.exe.gz"
+    sh "chmod +x #{package_dir}/bin/pact_mock_server_cli.exe"
+  when "windows-arm64"
+    sh "curl -L -o #{package_dir}/bin/pact_mock_server_cli.exe.gz https://github.com/pact-foundation/pact-core-mock-server//releases/download/pact_mock_server_cli-v#{MOCK_SERVER_CLI_VERSION}/pact_mock_server_cli-windows-aarch64.exe.gz"
     sh "gunzip -N -f #{package_dir}/bin/pact_mock_server_cli.exe.gz"
     sh "chmod +x #{package_dir}/bin/pact_mock_server_cli.exe"
   end
@@ -314,6 +335,10 @@ def install_verifier_cli(package_dir, package_target)
     sh "curl -L -o #{package_dir}/bin/pact_verifier_cli.exe.gz https://github.com/pact-foundation/pact-reference/releases/download/pact_verifier_cli-v#{VERIFIER_CLI_VERSION}/pact_verifier_cli-windows-x86_64.exe.gz"
     sh "gunzip -N -f #{package_dir}/bin/pact_verifier_cli.exe.gz"
     sh "chmod +x #{package_dir}/bin/pact_verifier_cli.exe"
+  when "windows-arm64"
+    sh "curl -L -o #{package_dir}/bin/pact_verifier_cli.exe.gz https://github.com/pact-foundation/pact-reference/releases/download/pact_verifier_cli-v#{VERIFIER_CLI_VERSION}/pact_verifier_cli-windows-aarch64.exe.gz"
+    sh "gunzip -N -f #{package_dir}/bin/pact_verifier_cli.exe.gz"
+    sh "chmod +x #{package_dir}/bin/pact_verifier_cli.exe"
   end
 end
 
@@ -339,6 +364,10 @@ def install_stub_server_cli(package_dir, package_target)
     sh "curl -L -o #{package_dir}/bin/pact-stub-server.exe.gz https://github.com/pact-foundation/pact-stub-server/releases/download/v#{STUB_SERVER_CLI_VERSION}/pact-stub-server-windows-x86_64.exe.gz"
     sh "gunzip -N -f #{package_dir}/bin/pact-stub-server.exe.gz"
     sh "chmod +x #{package_dir}/bin/pact-stub-server.exe"
+  when "windows-arm64"
+    sh "curl -L -o #{package_dir}/bin/pact-stub-server.exe.gz https://github.com/pact-foundation/pact-stub-server/releases/download/v#{STUB_SERVER_CLI_VERSION}/pact-stub-server-windows-aarch64.exe.gz"
+    sh "gunzip -N -f #{package_dir}/bin/pact-stub-server.exe.gz"
+    sh "chmod +x #{package_dir}/bin/pact-stub-server.exe"
   end
 end
 
@@ -358,6 +387,9 @@ def install_broker_cli(package_dir, package_target)
     sh "chmod +x #{package_dir}/bin/pact-broker-cli"
   when "windows-x86_64"
     sh "curl -L -o #{package_dir}/bin/pact-broker-cli.exe https://github.com/pact-foundation/pact-broker-cli/releases/download/v#{PACT_BROKER_CLI_VERSION}/pact-broker-cli-x86_64-windows-gnu.exe"
+    sh "chmod +x #{package_dir}/bin/pact-broker-cli.exe"
+  when "windows-arm64"
+    sh "curl -L -o #{package_dir}/bin/pact-broker-cli.exe https://github.com/pact-foundation/pact-broker-cli/releases/download/v#{PACT_BROKER_CLI_VERSION}/pact-broker-cli-aarch64-windows-msvc.exe"
     sh "chmod +x #{package_dir}/bin/pact-broker-cli.exe"
   end
 end

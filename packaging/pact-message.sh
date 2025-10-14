@@ -15,6 +15,12 @@ done
 RDIR="$( dirname "$SOURCE" )"
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
+if [ -z "${PACT_CLI_LEGACY}" ]; then
+  echo "pact-message is deprecated. Please use pact_mock_server_cli instead."
+  echo "or set the PACT_CLI_LEGACY environment variable to use the old CLI."
+  exit 1
+fi
+
 # Figure out where this script is located.
 LIBDIR="$(cd "$DIR" && cd ../lib && pwd)"
 
