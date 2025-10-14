@@ -3,6 +3,12 @@
 SET RUNNING_PATH=%~dp0
 CALL :RESOLVE "%RUNNING_PATH%\.." ROOT_PATH
 
+IF NOT DEFINED PACT_CLI_LEGACY (
+    echo pact-message is deprecated. Please use pact_mock_server_cli instead.
+    echo or set the PACT_CLI_LEGACY environment variable to use the old CLI.
+    EXIT /B 1
+)
+
 :: Tell Bundler where the Gemfile and gems are.
 set "BUNDLE_GEMFILE=%ROOT_PATH%\lib\vendor\Gemfile"
 set BUNDLE_IGNORE_CONFIG=
