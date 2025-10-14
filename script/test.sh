@@ -42,7 +42,6 @@ PATH_TO_BIN=.${PATH_SEPERATOR}pkg${PATH_SEPERATOR}pact${PATH_SEPERATOR}bin${PATH
 tools=(
   pact
   pact-broker
-  pact-message
   pact-mock-service
   pact-provider-verifier
   pact-stub-service
@@ -53,6 +52,10 @@ tools=(
   pact_mock_server_cli
   pact-broker-cli
 )
+
+if [ ! -z "${PACT_CLI_LEGACY:-}" ]; then
+  tools+=(pact-message)
+fi
 
 test_cmd=""
 for tool in ${tools[@]}; do
