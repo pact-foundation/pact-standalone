@@ -41,6 +41,7 @@ jobs:
       matrix:
         os: ["windows-latest","ubuntu-latest","macos-latest"]
         shell: ["sh","bash"]
+        pact_cli_legacy:  ["", "1"]
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v5
@@ -48,3 +49,5 @@ jobs:
       uses: actions/download-artifact@v4
     - name: test ${{ matrix.os }} package
       run: ./script/unpack-and-test.sh
+      env:
+        PACT_CLI_LEGACY: ${{ matrix.pact_cli_legacy }}
