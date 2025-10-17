@@ -5,10 +5,10 @@ CALL :RESOLVE "%RUNNING_PATH%\.." ROOT_PATH
 
 IF NOT DEFINED PACT_CLI_LEGACY (
     IF "%~1"=="" (
-        %RUNNING_PATH%pact-broker-cli.exe --help
+        %RUNNING_PATH%pact.exe broker --help
         EXIT /B %ERRORLEVEL%
     ) ELSE (
-        %RUNNING_PATH%pact-broker-cli.exe %*
+        %RUNNING_PATH%pact.exe broker %*
         EXIT /B %ERRORLEVEL%
     )
 )

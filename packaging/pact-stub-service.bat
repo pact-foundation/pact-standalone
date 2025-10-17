@@ -4,8 +4,13 @@ SET RUNNING_PATH=%~dp0
 CALL :RESOLVE "%RUNNING_PATH%\.." ROOT_PATH
 
 IF NOT DEFINED PACT_CLI_LEGACY (
-    %RUNNING_PATH%pact-stub-server.exe %*
-    EXIT /B %ERRORLEVEL%
+    IF "%~1"=="" (
+        %RUNNING_PATH%pact.exe stub --help
+        EXIT /B %ERRORLEVEL%
+    ) ELSE (
+        %RUNNING_PATH%pact.exe stub %*
+        EXIT /B %ERRORLEVEL%
+    )
 )
 
 :: Tell Bundler where the Gemfile and gems are.

@@ -4,8 +4,13 @@ SET RUNNING_PATH=%~dp0
 CALL :RESOLVE "%RUNNING_PATH%\.." ROOT_PATH
 
 IF NOT DEFINED PACT_CLI_LEGACY (
-    %RUNNING_PATH%pact-broker-cli.exe publish %*
-    EXIT /B %ERRORLEVEL%
+    IF "%~1"=="" (
+        %RUNNING_PATH%pact.exe pact publish --help
+        EXIT /B %ERRORLEVEL%
+    ) ELSE (
+        %RUNNING_PATH%pact.exe pact publish %*
+        EXIT /B %ERRORLEVEL%
+    )
 )
 
 :: Tell Bundler where the Gemfile and gems are.

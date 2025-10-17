@@ -4,9 +4,15 @@ SET RUNNING_PATH=%~dp0
 CALL :RESOLVE "%RUNNING_PATH%\.." ROOT_PATH
 
 IF NOT DEFINED PACT_CLI_LEGACY (
-    %RUNNING_PATH%pact_mock_server_cli.exe %*
-    EXIT /B %ERRORLEVEL%
+    IF "%~1"=="" (
+        %RUNNING_PATH%pact.exe mock --help
+        EXIT /B %ERRORLEVEL%
+    ) ELSE (
+        %RUNNING_PATH%pact.exe mock %*
+        EXIT /B %ERRORLEVEL%
+    )
 )
+
 
 :: Tell Bundler where the Gemfile and gems are.
 set "BUNDLE_GEMFILE=%ROOT_PATH%\lib\vendor\Gemfile"

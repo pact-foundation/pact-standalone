@@ -27,18 +27,13 @@ Binaries will be extracted into `pact/bin`:
 
 ```
 ./pact/bin/
-├── pact (central entry point to all binaries)
-├── pact-broker-cli
-├── pact_mock_server_cli
-├── pact-stub-server
-├── pact_verifier_cli
-├── pact-plugin-cli
-├── pact-broker (legacy) - use `pact-broker-cli`
-├── pactflow (legacy) - use `pact-broker-cli pactflow`
-├── pact-message (legacy) - use `pact_mock_server_cli` (consumer) / `pact_verifier_cli` (provider)
-├── pact-mock-service (legacy) - use `pact_mock_server_cli`
-├── pact-provider-verifier (legacy) - use `pact_verifier_cli`
-└── pact-stub-service (legacy) - use `pact-stub-server`
+├── pact
+├── pact-broker (legacy) - use `pact broker`
+├── pactflow (legacy) - use `pact pactflow`
+├── pact-message (legacy) - use `pact mock` (consumer) / `pact verifier` (provider)
+├── pact-mock-service (legacy) - use `pact mock`
+├── pact-provider-verifier (legacy) - use `pact verifier`
+└── pact-stub-service (legacy) - use `pact stub`
 ```
 
 Note: from `v2.6.0+`, the legacy commands will redirect to the new cli executables built in rust.

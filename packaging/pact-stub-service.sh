@@ -16,9 +16,13 @@ RDIR="$( dirname "$SOURCE" )"
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 if [ -z "${PACT_CLI_LEGACY}" ]; then
-  APP="$DIR/pact-stub-server"
+  APP="$DIR/pact"
   if [ -x "$APP" ]; then
-    exec "$APP" "$@"
+    if [ "$#" -eq 0 ]; then
+      exec "$APP" stub --help
+    else
+      exec "$APP" stub "$@"
+    fi
     exit $?
   fi
 fi

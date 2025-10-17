@@ -16,9 +16,13 @@ RDIR="$( dirname "$SOURCE" )"
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 if [ -z "${PACT_CLI_LEGACY}" ]; then
-  APP="$DIR/pact_mock_server_cli"
+  APP="$DIR/pact"
   if [ -x "$APP" ]; then
-    exec "$APP" "$@"
+    if [ "$#" -eq 0 ]; then
+      exec "$APP" mock --help
+    else
+      exec "$APP" mock "$@"
+    fi
     exit $?
   fi
 fi

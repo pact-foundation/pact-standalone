@@ -16,9 +16,13 @@ RDIR="$( dirname "$SOURCE" )"
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 if [ -z "${PACT_CLI_LEGACY}" ]; then
-  APP="$DIR/pact-broker-cli pactflow"
+  APP="$DIR/pact"
   if [ -x "$APP" ]; then
-    exec "$APP" "$@"
+    if [ "$#" -eq 0 ]; then
+      exec "$APP" pactflow --help
+    else
+      exec "$APP" pactflow "$@"
+    fi
     exit $?
   fi
 fi

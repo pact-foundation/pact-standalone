@@ -16,9 +16,13 @@ RDIR="$( dirname "$SOURCE" )"
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 if [ -z "${PACT_CLI_LEGACY}" ]; then
-  APP="$DIR/pact-broker-cli publish"
+  APP="$DIR/pact"
   if [ -x "$APP" ]; then
-    exec "$APP" "$@"
+    if [ "$#" -eq 0 ]; then
+      exec "$APP" pact publish --help
+    else
+      exec "$APP" pact publish "$@"
+    fi
     exit $?
   fi
 fi

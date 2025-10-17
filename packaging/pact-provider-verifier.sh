@@ -16,9 +16,13 @@ RDIR="$( dirname "$SOURCE" )"
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 if [ -z "${PACT_CLI_LEGACY}" ]; then
-  APP="$DIR/pact_verifier_cli"
+  APP="$DIR/pact"
   if [ -x "$APP" ]; then
-    exec "$APP" "$@"
+    if [ "$#" -eq 0 ]; then
+      exec "$APP" verifier --help
+    else
+      exec "$APP" verifier "$@"
+    fi
     exit $?
   fi
 fi

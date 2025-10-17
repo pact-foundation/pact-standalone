@@ -14,6 +14,7 @@ MOCK_SERVER_CLI_VERSION = "1.0.6" # https://github.com/pact-foundation/pact-core
 VERIFIER_CLI_VERSION = "1.2.0" # https://github.com/pact-foundation/pact-reference/releases
 STUB_SERVER_CLI_VERSION = "0.6.2" # https://github.com/pact-foundation/pact-stub-server/releases
 PACT_BROKER_CLI_VERSION = "0.2.0" # https://github.com/pact-foundation/pact-broker-cli/releases
+PACT_CLI_VERSION = "0.6.0" # https://github.com/you54f/pact-cli/releases
 
 desc "Package pact-standalone for OSX, Linux x86_64 and windows x86_64"
 task :package => ['package:linux:x86_64','package:linux:arm64', 'package:osx:x86_64', 'package:osx:arm64','package:windows:x86_64', 'package:windows:arm64']
@@ -146,11 +147,12 @@ def create_package(version, source_target, package_target, os_type)
     end
   remove_unnecessary_files package_dir
   end
-  install_plugin_cli package_dir, package_target
-  install_mock_server_cli package_dir, package_target
-  install_verifier_cli package_dir, package_target
-  install_stub_server_cli package_dir, package_target
-  install_broker_cli package_dir, package_target
+  install_pact_cli package_dir, package_target
+  # install_plugin_cli package_dir, package_target
+  # install_mock_server_cli package_dir, package_target
+  # install_verifier_cli package_dir, package_target
+  # install_stub_server_cli package_dir, package_target
+  # install_broker_cli package_dir, package_target
 
   if !ENV['DIR_ONLY']
     sh "mkdir -p pkg"
@@ -391,5 +393,28 @@ def install_broker_cli(package_dir, package_target)
   when "windows-arm64"
     sh "curl -L -o #{package_dir}/bin/pact-broker-cli.exe https://github.com/pact-foundation/pact-broker-cli/releases/download/v#{PACT_BROKER_CLI_VERSION}/pact-broker-cli-aarch64-windows-msvc.exe"
     sh "chmod +x #{package_dir}/bin/pact-broker-cli.exe"
+  end
+end
+
+def install_pact_cli(package_dir, package_target)
+  case package_target
+  when "linux-x86_64"
+    sh "curl --fail -L -o #{package_dir}/bin/pact https://github.com/you54f/pact-cli/releases/download/v#{PACT_CLI_VERSION}/pact-x86_64-linux-musl"
+    sh "chmod +x #{package_dir}/bin/pact"
+  when "linux-arm64"
+    sh "curl --fail -L -o #{package_dir}/bin/pact https://github.com/you54f/pact-cli/releases/download/v#{PACT_CLI_VERSION}/pact-aarch64-linux-musl"
+    sh "chmod +x #{package_dir}/bin/pact"
+  when "osx-x86_64"
+    sh "curl --fail -L -o #{package_dir}/bin/pact https://github.com/you54f/pact-cli/releases/download/v#{PACT_CLI_VERSION}/pact-x86_64-macos"
+    sh "chmod +x #{package_dir}/bin/pact"
+  when "osx-arm64"
+    sh "curl --fail -L -o #{package_dir}/bin/pact https://github.com/you54f/pact-cli/releases/download/v#{PACT_CLI_VERSION}/pact-aarch64-macos"
+    sh "chmod +x #{package_dir}/bin/pact"
+  when "windows-x86_64"
+    sh "curl --fail -L -o #{package_dir}/bin/pact.exe https://github.com/you54f/pact-cli/releases/download/v#{PACT_CLI_VERSION}/pact-x86_64-windows-gnu.exe"
+    sh "chmod +x #{package_dir}/bin/pact.exe"
+  when "windows-arm64"
+    sh "curl --fail -L -o #{package_dir}/bin/pact.exe https://github.com/you54f/pact-cli/releases/download/v#{PACT_CLI_VERSION}/pact-aarch64-windows-msvc.exe"
+    sh "chmod +x #{package_dir}/bin/pact.exe"
   end
 end
