@@ -1,7 +1,8 @@
 # For Bundler.with_unbundled_env
 require 'bundler/setup'
 
-PACKAGE_NAME = "pact"
+PACKAGE_NAME = 'pact'
+
 VERSION = File.read('VERSION').strip
 TRAVELING_RUBY_VERSION = "20250625-3.3.9"
 TRAVELING_RUBY_PKG_DATE = TRAVELING_RUBY_VERSION.split("-").first
@@ -50,7 +51,7 @@ namespace :package do
   desc "Install gems to local directory"
   task :bundle_install do
     if RUBY_VERSION !~ /^#{RUBY_MAJOR_VERSION}\.#{RUBY_MINOR_VERSION}\./
-      abort "You can only 'bundle install' using Ruby #{RUBY_VERSION}, because that's what Traveling Ruby uses."
+      abort "You can only 'bundle install' using Ruby #{TRAVELING_RB_VERSION}, because that's what Traveling Ruby uses."
     end
     sh "rm -rf build/tmp"
     sh "mkdir -p build/tmp"
@@ -58,7 +59,7 @@ namespace :package do
     sh "mkdir -p build/tmp/lib/pact/mock_service"
     # sh "cp lib/pact/mock_service/version.rb build/tmp/lib/pact/mock_service/version.rb"
     Bundler.with_unbundled_env do
-      sh "cd build/tmp && env bundle lock --add-platform x64-mingw32 && bundle config set --local path '../vendor' && env BUNDLE_DEPLOYMENT=true bundle install"
+      sh "cd build/tmp && bundle config set --local path '../vendor' && env BUNDLE_DEPLOYMENT=true bundle install"
       generate_readme
     end
     sh "rm -rf build/tmp"
@@ -112,7 +113,7 @@ def create_package(version, source_target, package_target, os_type)
 
   case os_type
   when :unix
-    Dir.chdir('packaging'){ Dir['pact*.sh'] }.each do | name |
+    Dir.chdir('packaging') { Dir['pact*.sh'] }.each do |name|
       sh "cp packaging/#{name} #{package_dir}/bin/#{name.chomp('.sh')}"
     end
   when :windows
@@ -131,6 +132,42 @@ def create_package(version, source_target, package_target, os_type)
   else
     sh "sed -i.bak '41s/^/#/' #{package_dir}/lib/ruby/lib/ruby/site_ruby/#{RUBY_COMPAT_VERSION}/bundler/stub_specification.rb"
   end
+
+  if !(package_target.include? 'windows')
+    os = package_target.split('-').first
+    arch = package_target.split('-').last
+    arch = 'aarch64' if arch == 'arm64' && os == 'linux'
+    os = 'darwin' if os == 'osx'
+    if os == 'windows' && arch == 'x86'
+      arch = 'x64'
+      os = 'mingw-ucrt'
+    end
+    gem_name = 'ffi'
+    gem_version = '1.17.2'
+    ## Install pact-ffi gem, disregarding current platform, to package for each provided platform-arch package
+    sh "gem install pact-ffi --platform #{arch}-#{os} --ignore-dependencies --no-document --install-dir '#{package_dir}/lib/ruby/lib/ruby/gems/#{RUBY_COMPAT_VERSION}'"
+
+    ## Install FFI gem, of required for pact-ffi
+    ## We later need to clean up the extensions which are built for the build system platform, not our targeted system
+
+    # sh "gem install ffi --platform #{arch}-#{os} --ignore-dependencies --no-document --install-dir '#{package_dir}/lib/ruby/lib/ruby/gems/#{RUBY_COMPAT_VERSION}'"
+    sh "gem install #{gem_name} -v #{gem_version} --no-document --install-dir '#{package_dir}/lib/ruby/lib/ruby/gems/#{RUBY_COMPAT_VERSION}'"
+
+    ## These commands clean up all the native extensions built on the host machine, which are host machine specific
+    sh "rm -rf #{package_dir}/lib/ruby/lib/ruby/gems/#{RUBY_COMPAT_VERSION}/gems/ffi*/ext"
+    sh "rm -rf #{package_dir}/lib/ruby/lib/ruby/gems/#{RUBY_COMPAT_VERSION}/gems/ffi*/lib/*.bundle"
+    sh "rm -rf #{package_dir}/lib/ruby/lib/ruby/gems/#{RUBY_COMPAT_VERSION}/gems/ffi*/samples"
+    sh "find #{package_dir}/lib/ruby/lib/ruby/gems/#{RUBY_COMPAT_VERSION}/gems/ffi*/lib -name '*.so' | xargs rm -f"
+    sh "find #{package_dir}/lib/ruby/lib/ruby/gems/#{RUBY_COMPAT_VERSION}/gems/ffi*/lib -name '*.bundle' | xargs rm -f"
+    sh "rm -rf #{package_dir}/lib/ruby/lib/ruby/gems/#{RUBY_COMPAT_VERSION}/gems/ffi*/*.bundle"
+    sh "rm -rf #{package_dir}/lib/ruby/lib/ruby/gems/#{RUBY_COMPAT_VERSION}/extensions/*/*/ffi*"
+    sh "rm -rf #{package_dir}/lib/ruby/lib/ruby/gems/#{RUBY_COMPAT_VERSION}/cache"
+    sh "rm -rf #{package_dir}/lib/ruby/lib/ruby/gems/#{RUBY_COMPAT_VERSION}/build_info"
+
+    ## This will download our native extension for FFI, which has been pre-built by the travelling ruby system
+    download_and_unpack_ext package_dir, package_target, ["#{gem_name}-#{gem_version}"]
+  end
+
   remove_unnecessary_files package_dir
   install_plugin_cli package_dir, package_target
   install_mock_server_cli package_dir, package_target
@@ -225,6 +262,20 @@ def remove_unnecessary_files package_dir
   # sh "rm -f #{package_dir}/lib/ruby/lib/ruby/*/*/enc/windows*"
   # sh "rm -f #{package_dir}/lib/ruby/lib/ruby/*/*/enc/utf_16*"
   # sh "rm -f #{package_dir}/lib/ruby/lib/ruby/*/*/enc/utf_32*"
+end
+
+def download_and_unpack_ext(package_dir, package_target, native_gems)
+  # no native gems for windows, so we exclude packing them here
+  return if package_target.include? 'windows'
+
+  native_gems.each do |native_gem|
+    sh "cd #{package_dir}/lib/ruby/lib/ruby/gems && \
+      curl -L -O --fail https://github.com/YOU54F/traveling-ruby/releases/download/rel-#{TRAVELING_RUBY_PKG_DATE}/traveling-ruby-gems-#{TRAVELING_RUBY_VERSION}-#{package_target}-#{native_gem}.tar.gz && \
+    ls && pwd && \
+    tar xzf traveling-ruby-gems-#{TRAVELING_RUBY_VERSION}-#{package_target}-#{native_gem}.tar.gz && \
+    tar xzf traveling-ruby-gems-#{TRAVELING_RUBY_VERSION}-#{package_target}-#{native_gem}.tar.gz && \
+    rm traveling-ruby-gems-#{TRAVELING_RUBY_VERSION}-#{package_target}-#{native_gem}.tar.gz"
+  end
 end
 
 def generate_readme
