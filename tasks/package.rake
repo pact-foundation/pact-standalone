@@ -14,7 +14,7 @@ MOCK_SERVER_CLI_VERSION = "1.0.6" # https://github.com/pact-foundation/pact-core
 VERIFIER_CLI_VERSION = "1.2.0" # https://github.com/pact-foundation/pact-reference/releases
 STUB_SERVER_CLI_VERSION = "0.6.2" # https://github.com/pact-foundation/pact-stub-server/releases
 PACT_BROKER_CLI_VERSION = "0.2.0" # https://github.com/pact-foundation/pact-broker-cli/releases
-PACT_CLI_VERSION = "0.6.0" # https://github.com/you54f/pact-cli/releases
+PACT_CLI_VERSION = "0.7.0" # https://github.com/you54f/pact-cli/releases
 
 desc "Package pact-standalone for OSX, Linux x86_64 and windows x86_64"
 task :package => ['package:linux:x86_64','package:linux:arm64', 'package:osx:x86_64', 'package:osx:arm64','package:windows:x86_64', 'package:windows:arm64']

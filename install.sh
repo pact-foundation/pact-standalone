@@ -97,7 +97,7 @@ echo "pact-standalone ${PACT_CLI_VERSION} installed to $(pwd)/pact"
 echo "-------------------"
 echo "available commands:"
 echo "-------------------"
-PROJECT_NAME=pact-cli
+PROJECT_NAME=pact
 PACT_CLI_BIN_PATH=${PWD}/pact/bin/
 
 ls -1 "$PACT_CLI_BIN_PATH"
