@@ -20,6 +20,7 @@ task :generate_release_notes, [:tag] do | t, args |
   release_notes_content = release_notes_content.gsub("<PACKAGE_VERSION>", VERSION)
   File.open(RELEASE_NOTES_PATH, "w") do |file|
     file << release_notes_content
+    file << "\n\n"
     file << readme_content
   end
 end

@@ -50,7 +50,7 @@ namespace :package do
   desc "Install gems to local directory"
   task :bundle_install do
     if RUBY_VERSION !~ /^#{RUBY_MAJOR_VERSION}\.#{RUBY_MINOR_VERSION}\./
-      abort "You can only 'bundle install' using Ruby #{RUBY_VERSION}, because that's what Traveling Ruby uses."
+      abort "You can only 'bundle install' using Ruby #{TRAVELING_RB_VERSION}, because that's what Traveling Ruby uses. \n You are using Ruby #{RUBY_VERSION}."
     end
     sh "rm -rf build/tmp"
     sh "mkdir -p build/tmp"
@@ -198,6 +198,9 @@ def remove_unnecessary_files package_dir
   sh "find #{package_dir}/lib/vendor/ruby/*/gems -name '*.o' | xargs rm -f"
   sh "find #{package_dir}/lib/vendor/ruby/*/gems -name '*.so' | xargs rm -f"
   sh "find #{package_dir}/lib/vendor/ruby/*/gems -name '*.bundle' | xargs rm -f"
+  sh "find #{package_dir}/lib/vendor/ruby/*/extensions -name '*.o' | xargs rm -f"
+  sh "find #{package_dir}/lib/vendor/ruby/*/extensions -name '*.so' | xargs rm -f"
+  sh "find #{package_dir}/lib/vendor/ruby/*/extensions -name '*.bundle' | xargs rm -f"
 
   # Remove Java files. They're only used for JRuby support"
   sh "find #{package_dir}/lib/vendor/ruby -name '*.java' | xargs rm -f"
