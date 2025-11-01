@@ -4,7 +4,6 @@
 
 Creates a standalone pact command line executable containing
 
-- The rust pact implementation via cargo executables
 - The ruby pact implementation via Traveling Ruby
 
 ## Package contents
@@ -17,26 +16,17 @@ This version (<%= ENV.fetch('VERSION') %>) of the Pact standalone executables pa
   * pact-provider-verifier gem <%= Pact::ProviderVerifier::VERSION %>
   * pact_broker-client gem <%= PactBroker::Client::VERSION %>
   * pact-message gem <%= Pact::Message::VERSION %>
-  * [pact_mock_server_cli](https://github.com/pact-foundation/pact-core-mock-server/tree/main/pact_mock_server_cli)
-  * [pact-stub-server](https://github.com/pact-foundation/pact-stub-server)
-  * [pact_verifier_cli](https://github.com/pact-foundation/pact-reference/tree/master/rust/pact_verifier_cli)
-  * [pact-plugin-cli](https://github.com/pact-foundation/pact-plugins/tree/main/cli)
 
 Binaries will be extracted into `pact/bin`:
 
 ```
 ./pact/bin/
-├── pact (central entry point to all binaries)
 ├── pact-broker
 ├── pactflow
-├── pact_mock_server_cli
-├── pact-stub-server
-├── pact_verifier_cli
-├── pact-plugin-cli
-├── pact-message (legacy)
-├── pact-mock-service (legacy)
-├── pact-provider-verifier (legacy)
-└── pact-stub-service (legacy)
+├── pact-message
+├── pact-mock-service
+├── pact-provider-verifier
+└── pact-stub-service
 ```
 
 ### Windows Users
@@ -47,14 +37,6 @@ eg.
 
 ```ps1
   .\pact\bin\pact-broker.bat
-```
-
-Please append `.exe` to any of the provided rust based binaries
-
-eg.
-
-```ps1
-  .\pact\bin\pact_mock_server_cli.exe
 ```
 
 ## Installation

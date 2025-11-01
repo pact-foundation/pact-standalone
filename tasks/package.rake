@@ -132,10 +132,6 @@ def create_package(version, source_target, package_target, os_type)
     sh "sed -i.bak '41s/^/#/' #{package_dir}/lib/ruby/lib/ruby/site_ruby/#{RUBY_COMPAT_VERSION}/bundler/stub_specification.rb"
   end
   remove_unnecessary_files package_dir
-  install_plugin_cli package_dir, package_target
-  install_mock_server_cli package_dir, package_target
-  install_verifier_cli package_dir, package_target
-  install_stub_server_cli package_dir, package_target
 
   if !ENV['DIR_ONLY']
     sh "mkdir -p pkg"
@@ -241,104 +237,4 @@ end
 def download_runtime(version, target)
   sh "cd build && curl -L -O --fail " +
      "https://github.com/YOU54F/traveling-ruby/releases/download/rel-#{TRAVELING_RUBY_PKG_DATE}/traveling-ruby-#{version}-#{target}.tar.gz"
-end
-
-def install_plugin_cli(package_dir, package_target)
-  case package_target
-  when "linux-x86_64"
-    sh "curl -L -o #{package_dir}/bin/pact-plugin-cli.gz https://github.com/pact-foundation/pact-plugins/releases/download/pact-plugin-cli-v#{PLUGIN_CLI_VERSION}/pact-plugin-cli-linux-x86_64.gz"
-    sh "gunzip -N -f #{package_dir}/bin/pact-plugin-cli.gz"
-    sh "chmod +x #{package_dir}/bin/pact-plugin-cli"
-  when "linux-arm64"
-    sh "curl -L -o #{package_dir}/bin/pact-plugin-cli.gz https://github.com/pact-foundation/pact-plugins/releases/download/pact-plugin-cli-v#{PLUGIN_CLI_VERSION}/pact-plugin-cli-linux-aarch64.gz"
-    sh "gunzip -N -f #{package_dir}/bin/pact-plugin-cli.gz"
-    sh "chmod +x #{package_dir}/bin/pact-plugin-cli"
-  when "osx-x86_64"
-    sh "curl -L -o #{package_dir}/bin/pact-plugin-cli.gz https://github.com/pact-foundation/pact-plugins/releases/download/pact-plugin-cli-v#{PLUGIN_CLI_VERSION}/pact-plugin-cli-macos-x86_64.gz"
-    sh "gunzip -N -f #{package_dir}/bin/pact-plugin-cli.gz"
-    sh "chmod +x #{package_dir}/bin/pact-plugin-cli"
-  when "osx-arm64"
-    sh "curl -L -o #{package_dir}/bin/pact-plugin-cli.gz https://github.com/pact-foundation/pact-plugins/releases/download/pact-plugin-cli-v#{PLUGIN_CLI_VERSION}/pact-plugin-cli-macos-aarch64.gz"
-    sh "gunzip -N -f #{package_dir}/bin/pact-plugin-cli.gz"
-    sh "chmod +x #{package_dir}/bin/pact-plugin-cli"
-  when "windows-x86_64"
-    sh "curl -L -o #{package_dir}/bin/pact-plugin-cli.exe.gz https://github.com/pact-foundation/pact-plugins/releases/download/pact-plugin-cli-v#{PLUGIN_CLI_VERSION}/pact-plugin-cli-windows-x86_64.exe.gz"
-    sh "gunzip -N -f #{package_dir}/bin/pact-plugin-cli.exe.gz"
-    sh "chmod +x #{package_dir}/bin/pact-plugin-cli.exe"
-  end
-end
-
-def install_mock_server_cli(package_dir, package_target)
-  case package_target
-  when "linux-x86_64"
-    sh "curl -L -o #{package_dir}/bin/pact_mock_server_cli.gz https://github.com/pact-foundation/pact-core-mock-server//releases/download/pact_mock_server_cli-v#{MOCK_SERVER_CLI_VERSION}/pact_mock_server_cli-linux-x86_64.gz"
-    sh "gunzip -N -f #{package_dir}/bin/pact_mock_server_cli.gz"
-    sh "chmod +x #{package_dir}/bin/pact_mock_server_cli"
-  when "linux-arm64"
-    sh "curl -L -o #{package_dir}/bin/pact_mock_server_cli.gz https://github.com/pact-foundation/pact-core-mock-server//releases/download/pact_mock_server_cli-v#{MOCK_SERVER_CLI_VERSION}/pact_mock_server_cli-linux-aarch64.gz"
-    sh "gunzip -N -f #{package_dir}/bin/pact_mock_server_cli.gz"
-    sh "chmod +x #{package_dir}/bin/pact_mock_server_cli"
-  when "osx-x86_64"
-    sh "curl -L -o #{package_dir}/bin/pact_mock_server_cli.gz https://github.com/pact-foundation/pact-core-mock-server//releases/download/pact_mock_server_cli-v#{MOCK_SERVER_CLI_VERSION}/pact_mock_server_cli-macos-x86_64.gz"
-    sh "gunzip -N -f #{package_dir}/bin/pact_mock_server_cli.gz"
-    sh "chmod +x #{package_dir}/bin/pact_mock_server_cli"
-  when "osx-arm64"
-    sh "curl -L -o #{package_dir}/bin/pact_mock_server_cli.gz https://github.com/pact-foundation/pact-core-mock-server//releases/download/pact_mock_server_cli-v#{MOCK_SERVER_CLI_VERSION}/pact_mock_server_cli-macos-aarch64.gz"
-    sh "gunzip -N -f #{package_dir}/bin/pact_mock_server_cli.gz"
-    sh "chmod +x #{package_dir}/bin/pact_mock_server_cli"
-  when "windows-x86_64"
-    sh "curl -L -o #{package_dir}/bin/pact_mock_server_cli.exe.gz https://github.com/pact-foundation/pact-core-mock-server//releases/download/pact_mock_server_cli-v#{MOCK_SERVER_CLI_VERSION}/pact_mock_server_cli-windows-x86_64.exe.gz"
-    sh "gunzip -N -f #{package_dir}/bin/pact_mock_server_cli.exe.gz"
-    sh "chmod +x #{package_dir}/bin/pact_mock_server_cli.exe"
-  end
-end
-
-def install_verifier_cli(package_dir, package_target)
-  case package_target
-  when "linux-x86_64"
-    sh "curl -L -o #{package_dir}/bin/pact_verifier_cli.gz https://github.com/pact-foundation/pact-reference/releases/download/pact_verifier_cli-v#{VERIFIER_CLI_VERSION}/pact_verifier_cli-linux-x86_64.gz"
-    sh "gunzip -N -f #{package_dir}/bin/pact_verifier_cli.gz"
-    sh "chmod +x #{package_dir}/bin/pact_verifier_cli"
-  when "linux-arm64"
-    sh "curl -L -o #{package_dir}/bin/pact_verifier_cli.gz https://github.com/pact-foundation/pact-reference/releases/download/pact_verifier_cli-v#{VERIFIER_CLI_VERSION}/pact_verifier_cli-linux-aarch64.gz"
-    sh "gunzip -N -f #{package_dir}/bin/pact_verifier_cli.gz"
-    sh "chmod +x #{package_dir}/bin/pact_verifier_cli"
-  when "osx-x86_64"
-    sh "curl -L -o #{package_dir}/bin/pact_verifier_cli.gz https://github.com/pact-foundation/pact-reference/releases/download/pact_verifier_cli-v#{VERIFIER_CLI_VERSION}/pact_verifier_cli-macos-x86_64.gz"
-    sh "gunzip -N -f #{package_dir}/bin/pact_verifier_cli.gz"
-    sh "chmod +x #{package_dir}/bin/pact_verifier_cli"
-  when "osx-arm64"
-    sh "curl -L -o #{package_dir}/bin/pact_verifier_cli.gz https://github.com/pact-foundation/pact-reference/releases/download/pact_verifier_cli-v#{VERIFIER_CLI_VERSION}/pact_verifier_cli-macos-aarch64.gz"
-    sh "gunzip -N -f #{package_dir}/bin/pact_verifier_cli.gz"
-    sh "chmod +x #{package_dir}/bin/pact_verifier_cli"
-  when "windows-x86_64"
-    sh "curl -L -o #{package_dir}/bin/pact_verifier_cli.exe.gz https://github.com/pact-foundation/pact-reference/releases/download/pact_verifier_cli-v#{VERIFIER_CLI_VERSION}/pact_verifier_cli-windows-x86_64.exe.gz"
-    sh "gunzip -N -f #{package_dir}/bin/pact_verifier_cli.exe.gz"
-    sh "chmod +x #{package_dir}/bin/pact_verifier_cli.exe"
-  end
-end
-
-def install_stub_server_cli(package_dir, package_target)
-  case package_target
-  when "linux-x86_64"
-    sh "curl -L -o #{package_dir}/bin/pact-stub-server.gz https://github.com/pact-foundation/pact-stub-server/releases/download/v#{STUB_SERVER_CLI_VERSION}/pact-stub-server-linux-x86_64.gz"
-    sh "gunzip -N -f #{package_dir}/bin/pact-stub-server.gz"
-    sh "chmod +x #{package_dir}/bin/pact-stub-server"
-  when "linux-arm64"
-    sh "curl -L -o #{package_dir}/bin/pact-stub-server.gz https://github.com/pact-foundation/pact-stub-server/releases/download/v#{STUB_SERVER_CLI_VERSION}/pact-stub-server-linux-aarch64.gz"
-    sh "gunzip -N -f #{package_dir}/bin/pact-stub-server.gz"
-    sh "chmod +x #{package_dir}/bin/pact-stub-server"
-  when "osx-x86_64"
-    sh "curl -L -o #{package_dir}/bin/pact-stub-server.gz https://github.com/pact-foundation/pact-stub-server/releases/download/v#{STUB_SERVER_CLI_VERSION}/pact-stub-server-osx-x86_64.gz"
-    sh "gunzip -N -f #{package_dir}/bin/pact-stub-server.gz"
-    sh "chmod +x #{package_dir}/bin/pact-stub-server"
-  when "osx-arm64"
-    sh "curl -L -o #{package_dir}/bin/pact-stub-server.gz https://github.com/pact-foundation/pact-stub-server/releases/download/v#{STUB_SERVER_CLI_VERSION}/pact-stub-server-osx-aarch64.gz"
-    sh "gunzip -N -f #{package_dir}/bin/pact-stub-server.gz"
-    sh "chmod +x #{package_dir}/bin/pact-stub-server"
-  when "windows-x86_64"
-    sh "curl -L -o #{package_dir}/bin/pact-stub-server.exe.gz https://github.com/pact-foundation/pact-stub-server/releases/download/v#{STUB_SERVER_CLI_VERSION}/pact-stub-server-windows-x86_64.exe.gz"
-    sh "gunzip -N -f #{package_dir}/bin/pact-stub-server.exe.gz"
-    sh "chmod +x #{package_dir}/bin/pact-stub-server.exe"
-  end
 end
