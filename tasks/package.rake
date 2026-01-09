@@ -3,7 +3,7 @@ require 'bundler/setup'
 
 PACKAGE_NAME = "pact"
 VERSION = File.read('VERSION').strip
-TRAVELING_RUBY_VERSION = "20250625-3.3.9"
+TRAVELING_RUBY_VERSION = "20251122-3.3.10"
 TRAVELING_RUBY_PKG_DATE = TRAVELING_RUBY_VERSION.split("-").first
 TRAVELING_RB_VERSION = TRAVELING_RUBY_VERSION.split("-").last
 RUBY_COMPAT_VERSION = TRAVELING_RB_VERSION.split(".").first(2).join(".") + ".0"
@@ -13,6 +13,15 @@ PLUGIN_CLI_VERSION = "0.1.3" # https://github.com/pact-foundation/pact-plugins/r
 MOCK_SERVER_CLI_VERSION = "1.0.6" # https://github.com/pact-foundation/pact-core-mock-server/releases
 VERIFIER_CLI_VERSION = "1.2.0" # https://github.com/pact-foundation/pact-reference/releases
 STUB_SERVER_CLI_VERSION = "0.6.2" # https://github.com/pact-foundation/pact-stub-server/releases
+
+# Native gem versions
+NATIVE_GEM_VERSIONS = {
+  bigdecimal: '3.3.1',
+  json: '2.16.0',
+  fiddle: '1.1.8',
+  'io-console': '0.8.1',
+}
+NATIVE_GEMS = NATIVE_GEM_VERSIONS.map { |k, v| "#{k}-#{v}" }
 
 desc "Package pact-standalone for OSX, Linux x86_64 and windows x86_64"
 task :package => ['package:linux:x86_64','package:linux:arm64', 'package:osx:x86_64', 'package:osx:arm64','package:windows:x86_64']
@@ -32,13 +41,13 @@ namespace :package do
 
   namespace :osx do
   desc "Package pact-standalone for OS X x86_64"
-  task :x86_64 => [:bundle_install, "build/traveling-ruby-#{TRAVELING_RUBY_VERSION}-osx-x86_64.tar.gz"] do
-    create_package(TRAVELING_RUBY_VERSION, "osx-x86_64", "osx-x86_64", :unix)
+  task :x86_64 => [:bundle_install, "build/traveling-ruby-#{TRAVELING_RUBY_VERSION}-macos-x86_64.tar.gz"] do
+    create_package(TRAVELING_RUBY_VERSION, "macos-x86_64", "osx-x86_64", :unix)
     end
 
   desc "Package pact-standalone for OS X arm64"
-  task :arm64 => [:bundle_install, "build/traveling-ruby-#{TRAVELING_RUBY_VERSION}-osx-arm64.tar.gz"] do
-    create_package(TRAVELING_RUBY_VERSION, "osx-arm64", "osx-arm64", :unix)
+  task :arm64 => [:bundle_install, "build/traveling-ruby-#{TRAVELING_RUBY_VERSION}-macos-arm64.tar.gz"] do
+    create_package(TRAVELING_RUBY_VERSION, "macos-arm64", "osx-arm64", :unix)
     end
   end
   namespace :windows do
@@ -58,11 +67,15 @@ namespace :package do
     sh "mkdir -p build/tmp/lib/pact/mock_service"
     # sh "cp lib/pact/mock_service/version.rb build/tmp/lib/pact/mock_service/version.rb"
     Bundler.with_unbundled_env do
-      sh "cd build/tmp && env bundle lock --add-platform x64-mingw32 && bundle config set --local path '../vendor' && env BUNDLE_DEPLOYMENT=true bundle install"
+      sh "cd build/tmp && env bundle config set --local path '../vendor' && env BUNDLE_DEPLOYMENT=true bundle install --verbose"
       generate_readme
     end
     sh "rm -rf build/tmp"
     sh "rm -rf build/vendor/*/*/cache/*"
+    sh "rm -rf build/vendor/ruby/*/extensions" # remove host built extensions
+    sh "find build/vendor/ruby/*/gems -name '*.so' | xargs rm -f"
+    sh "find build/vendor/ruby/*/gems -name '*.bundle' | xargs rm -f"
+    sh "find build/vendor/ruby/*/gems -name '*.o' | xargs rm -f"
   end
 
   task :generate_readme do
@@ -83,12 +96,12 @@ file "build/traveling-ruby-#{TRAVELING_RUBY_VERSION}-linux-arm64.tar.gz" do
   download_runtime(TRAVELING_RUBY_VERSION, "linux-arm64")
 end
 
-file "build/traveling-ruby-#{TRAVELING_RUBY_VERSION}-osx-x86_64.tar.gz" do
-  download_runtime(TRAVELING_RUBY_VERSION, "osx-x86_64")
+file "build/traveling-ruby-#{TRAVELING_RUBY_VERSION}-macos-x86_64.tar.gz" do
+  download_runtime(TRAVELING_RUBY_VERSION, "macos-x86_64")
 end
 
-file "build/traveling-ruby-#{TRAVELING_RUBY_VERSION}-osx-arm64.tar.gz" do
-  download_runtime(TRAVELING_RUBY_VERSION, "osx-arm64")
+file "build/traveling-ruby-#{TRAVELING_RUBY_VERSION}-macos-arm64.tar.gz" do
+  download_runtime(TRAVELING_RUBY_VERSION, "macos-arm64")
 end
 
 file "build/traveling-ruby-#{TRAVELING_RUBY_VERSION}-windows-x86_64.tar.gz" do
@@ -123,14 +136,23 @@ def create_package(version, source_target, package_target, os_type)
 
   sh "cp -pR build/vendor #{package_dir}/lib/"
   sh "cp packaging/Gemfile packaging/Gemfile.lock #{package_dir}/lib/vendor/"
+
+  # If packaging for Windows, patch Gemfile.lock for nokogiri platform as we are building platform specific gems with rake-compiler-dock
+  if os_type == :windows && source_target.include?("arm64")
+    lockfile = "#{package_dir}/lib/vendor/Gemfile.lock"
+    if File.exist?(lockfile)
+    content = File.read(lockfile)
+    if content =~ /^    nokogiri \(#{NATIVE_GEM_VERSIONS[ :nokogiri ]}\)/
+      arch = "-aarch64-mingw-ucrt"
+      patched = content.gsub(/^    nokogiri \(#{NATIVE_GEM_VERSIONS[ :nokogiri ]}\)/, "    nokogiri (#{NATIVE_GEM_VERSIONS[ :nokogiri ]}#{arch})")
+      File.write(lockfile, patched)
+    end
+    end
+  end
+
   sh "mkdir #{package_dir}/lib/vendor/.bundle"
   sh "cp packaging/bundler-config #{package_dir}/lib/vendor/.bundle/config"
-
-  if package_target.include? 'windows'
-    sh "sed -i.bak '37s/^/#/' #{package_dir}/lib/ruby/lib/ruby/#{RUBY_COMPAT_VERSION}/bundler/stub_specification.rb"
-  else
-    sh "sed -i.bak '41s/^/#/' #{package_dir}/lib/ruby/lib/ruby/site_ruby/#{RUBY_COMPAT_VERSION}/bundler/stub_specification.rb"
-  end
+  download_and_unpack_ext(package_dir, source_target, NATIVE_GEMS)
   remove_unnecessary_files package_dir
   install_plugin_cli package_dir, package_target
   install_mock_server_cli package_dir, package_target
@@ -340,5 +362,37 @@ def install_stub_server_cli(package_dir, package_target)
     sh "curl -L -o #{package_dir}/bin/pact-stub-server.exe.gz https://github.com/pact-foundation/pact-stub-server/releases/download/v#{STUB_SERVER_CLI_VERSION}/pact-stub-server-windows-x86_64.exe.gz"
     sh "gunzip -N -f #{package_dir}/bin/pact-stub-server.exe.gz"
     sh "chmod +x #{package_dir}/bin/pact-stub-server.exe"
+  end
+end
+
+def download_and_unpack_ext(package_dir, target, native_gems)
+  native_gems.each do |native_gem|
+    is_windows = target.include?("windows")
+    is_arm64 = target.include?("arm64")
+    is_nokogiri = native_gem.start_with?("nokogiri-")
+    native_gem_alt = is_windows && is_nokogiri && is_arm64 ? "#{native_gem}-aarch64-mingw-ucrt" : native_gem
+    tarball = "build/traveling-ruby-gems-#{TRAVELING_RUBY_VERSION}-#{target}-#{native_gem_alt}.tar.gz"
+    url = "https://github.com/trubygems/traveling-ruby/releases/download/rel-#{TRAVELING_RUBY_PKG_DATE}/traveling-ruby-gems-#{TRAVELING_RUBY_VERSION}-#{target}-#{native_gem_alt}.tar.gz"
+
+    sh "curl -L --fail #{url} -o #{tarball}"
+
+    if is_windows && is_nokogiri && is_arm64
+      gem_dir = "#{package_dir}/lib/vendor/ruby/#{RUBY_COMPAT_VERSION}/gems"
+      spec_dir = "#{package_dir}/lib/vendor/ruby/#{RUBY_COMPAT_VERSION}/specifications"
+      sh "mkdir -p #{gem_dir} #{spec_dir}"
+      # Unpack gem contents
+      sh "rm -rf #{gem_dir}/#{native_gem}"
+      sh "mkdir -p #{gem_dir}/#{native_gem_alt}"
+      wildcards_flag = RUBY_PLATFORM =~ /linux/ ? "--wildcards" : ""
+      sh "tar -xzf #{tarball} #{wildcards_flag} --strip-components=1 -C #{gem_dir}/#{native_gem_alt} 'nokogiri-*'"
+      # Unpack gemspec
+      sh "tar -xzf #{tarball} #{wildcards_flag} --strip-components=0 -C #{spec_dir} 'nokogiri-*.gemspec'"
+      # remove ruby gemspec
+      sh "rm -f #{spec_dir}/#{native_gem}.gemspec"
+    else
+      sh "tar -xzf #{tarball} -C #{package_dir}/lib/vendor/ruby"
+    end
+
+    sh "rm #{tarball}"
   end
 end
