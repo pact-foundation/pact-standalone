@@ -17,7 +17,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v5
-    - uses: ruby/setup-ruby@v1.264.0
+    - uses: ruby/setup-ruby@v1.288.0
       with:
         ruby-version: 3.3.9
     - name: Set up environment
