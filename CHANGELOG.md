@@ -1,3 +1,13 @@
+<a name="v2.5.12"></a>
+### v2.5.12 (2026-02-23)
+
+
+#### Features
+
+* **gems**
+  * update to pact (1.67.5)	 ([d79acad](/../../commit/d79acad))
+
+
 <a name="v2.5.11"></a>
 ### v2.5.11 (2026-02-09)
 
