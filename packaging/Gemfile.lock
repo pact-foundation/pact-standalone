@@ -136,7 +136,7 @@ GEM
       readline
       sync
     uri (1.1.1)
-    webrick (1.9.1)
+    webrick (1.9.2)
     zeitwerk (2.7.5)
 
 PLATFORMS
@@ -165,7 +165,7 @@ DEPENDENCIES
   pact-mock_service (= 3.12.4)
   pact-provider-verifier (= 1.39.1)
   pact_broker-client (= 1.77.0)
-  webrick (= 1.9.1)
+  webrick (= 1.9.2)
 
 BUNDLED WITH
    2.5.18
