@@ -27,7 +27,7 @@ jobs:
     - name: Show standalone packages
       run: ls pkg
     - name: Upload standalone packages
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: pkg
         path: pkg
@@ -45,6 +45,6 @@ jobs:
     steps:
     - uses: actions/checkout@v5
     - name: Download all workflow run artifacts
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v8
     - name: test ${{ matrix.os }} package
       run: ./script/unpack-and-test.sh
