@@ -10,6 +10,6 @@ gem "webrick", "1.9.1"
 # we require gem locking for gems with native extensions
 # due to lack of windows support
 gem "json", "2.7.2"
-gem "bigdecimal", "3.1.5"
+gem "bigdecimal", "3.3.1"
 gem "fiddle", "1.1.2"
 gem "io-console", "0.7.1"
