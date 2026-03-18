@@ -29,6 +29,10 @@ Binaries will be extracted into `pact/bin`:
 └── pact-stub-service
 ```
 
+[!NOTE]
+
+We have recently removed the bundled Rust tools from the Pact (Ruby) standalone. You can find the Rust tools at [pact-foundation/pact-cli](https://github.com/pact-foundation/pact-cli).
+
 ### Windows Users
 
 Please append `.bat` to any of the provided ruby-based binaries
