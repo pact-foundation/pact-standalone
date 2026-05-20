@@ -13,7 +13,7 @@ jobs:
       with:
         fetch-depth: 0
 
-    - uses: ruby/setup-ruby@v1.295.0
+    - uses: ruby/setup-ruby@v1.310.0
       with:
         ruby-version: 3.3.9
 
