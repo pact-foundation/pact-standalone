@@ -1,3 +1,5 @@
+$stderr.puts "WARN: This project is deprecated and no longer receiving updates. We recommend you upgrade to our supported tools: https://docs.pact.io/implementation_guides/cli"
+
 require 'pact_broker/client/cli/broker'
 
 if ENV['PACT_BROKER_DISABLE_SSL_VERIFICATION'] == 'true' || ENV['PACT_DISABLE_SSL_VERIFICATION'] == 'true'

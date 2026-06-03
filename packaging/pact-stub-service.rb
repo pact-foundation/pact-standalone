@@ -1,3 +1,5 @@
+$stderr.puts "WARN: This project is deprecated and no longer receiving updates. We recommend you upgrade to our supported tools: https://docs.pact.io/implementation_guides/cli"
+
 require 'pact/stub_service/cli'
 
 class Thor

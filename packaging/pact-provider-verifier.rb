@@ -2,6 +2,8 @@
 # the output can be parsed cleanly by wrapper languages
 ENV['PACT_EXECUTING_LANGUAGE'] ||= 'unknown'
 
+$stderr.puts "WARN: This project is deprecated and no longer receiving updates. We recommend you upgrade to our supported tools: https://docs.pact.io/implementation_guides/cli"
+
 # Travelling Ruby sets its own CA cert bundle in lib/ruby/bin/ruby_environment
 # and creates backup environment variables for the original SSL_CERT values.
 # Restore the original values here *if they are present* so that we can connect to
