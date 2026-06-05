@@ -3,7 +3,7 @@ require 'bundler/setup'
 
 PACKAGE_NAME = "pact"
 VERSION = File.read('VERSION').strip
-TRAVELING_RUBY_VERSION = "20250625-3.3.9"
+TRAVELING_RUBY_VERSION = "20251122-3.4.7"
 TRAVELING_RUBY_PKG_DATE = TRAVELING_RUBY_VERSION.split("-").first
 TRAVELING_RB_VERSION = TRAVELING_RUBY_VERSION.split("-").last
 RUBY_COMPAT_VERSION = TRAVELING_RB_VERSION.split(".").first(2).join(".") + ".0"
@@ -14,8 +14,8 @@ MOCK_SERVER_CLI_VERSION = "1.0.6" # https://github.com/pact-foundation/pact-core
 VERIFIER_CLI_VERSION = "1.2.0" # https://github.com/pact-foundation/pact-reference/releases
 STUB_SERVER_CLI_VERSION = "0.6.2" # https://github.com/pact-foundation/pact-stub-server/releases
 
-desc "Package pact-standalone for OSX, Linux x86_64 and windows x86_64"
-task :package => ['package:linux:x86_64','package:linux:arm64', 'package:osx:x86_64', 'package:osx:arm64','package:windows:x86_64']
+desc "Package pact-standalone for macOS, Linux x86_64 and windows x86_64"
+task :package => ['package:linux:x86_64','package:linux:arm64', 'package:macos:x86_64', 'package:macos:arm64','package:windows:x86_64']
 
 namespace :package do
   namespace :linux do
@@ -30,15 +30,15 @@ namespace :package do
     end
   end
 
-  namespace :osx do
-  desc "Package pact-standalone for OS X x86_64"
-  task :x86_64 => [:bundle_install, "build/traveling-ruby-#{TRAVELING_RUBY_VERSION}-osx-x86_64.tar.gz"] do
-    create_package(TRAVELING_RUBY_VERSION, "osx-x86_64", "osx-x86_64", :unix)
+  namespace :macos do
+  desc "Package pact-standalone for macOS x86_64"
+  task :x86_64 => [:bundle_install, "build/traveling-ruby-#{TRAVELING_RUBY_VERSION}-macos-x86_64.tar.gz"] do
+    create_package(TRAVELING_RUBY_VERSION, "macos-x86_64", "macos-x86_64", :unix)
     end
 
-  desc "Package pact-standalone for OS X arm64"
-  task :arm64 => [:bundle_install, "build/traveling-ruby-#{TRAVELING_RUBY_VERSION}-osx-arm64.tar.gz"] do
-    create_package(TRAVELING_RUBY_VERSION, "osx-arm64", "osx-arm64", :unix)
+  desc "Package pact-standalone for macOS arm64"
+  task :arm64 => [:bundle_install, "build/traveling-ruby-#{TRAVELING_RUBY_VERSION}-macos-arm64.tar.gz"] do
+    create_package(TRAVELING_RUBY_VERSION, "macos-arm64", "macos-arm64", :unix)
     end
   end
   namespace :windows do
@@ -83,12 +83,12 @@ file "build/traveling-ruby-#{TRAVELING_RUBY_VERSION}-linux-arm64.tar.gz" do
   download_runtime(TRAVELING_RUBY_VERSION, "linux-arm64")
 end
 
-file "build/traveling-ruby-#{TRAVELING_RUBY_VERSION}-osx-x86_64.tar.gz" do
-  download_runtime(TRAVELING_RUBY_VERSION, "osx-x86_64")
+file "build/traveling-ruby-#{TRAVELING_RUBY_VERSION}-macos-x86_64.tar.gz" do
+  download_runtime(TRAVELING_RUBY_VERSION, "macos-x86_64")
 end
 
-file "build/traveling-ruby-#{TRAVELING_RUBY_VERSION}-osx-arm64.tar.gz" do
-  download_runtime(TRAVELING_RUBY_VERSION, "osx-arm64")
+file "build/traveling-ruby-#{TRAVELING_RUBY_VERSION}-macos-arm64.tar.gz" do
+  download_runtime(TRAVELING_RUBY_VERSION, "macos-arm64")
 end
 
 file "build/traveling-ruby-#{TRAVELING_RUBY_VERSION}-windows-x86_64.tar.gz" do
@@ -127,7 +127,7 @@ def create_package(version, source_target, package_target, os_type)
   sh "cp packaging/bundler-config #{package_dir}/lib/vendor/.bundle/config"
 
   if package_target.include? 'windows'
-    sh "sed -i.bak '37s/^/#/' #{package_dir}/lib/ruby/lib/ruby/#{RUBY_COMPAT_VERSION}/bundler/stub_specification.rb"
+    sh "sed -i.bak '41s/^/#/' #{package_dir}/lib/ruby/lib/ruby/#{RUBY_COMPAT_VERSION}/bundler/stub_specification.rb"
   else
     sh "sed -i.bak '41s/^/#/' #{package_dir}/lib/ruby/lib/ruby/site_ruby/#{RUBY_COMPAT_VERSION}/bundler/stub_specification.rb"
   end
