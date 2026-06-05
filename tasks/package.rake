@@ -9,6 +9,7 @@ TRAVELING_RB_VERSION = TRAVELING_RUBY_VERSION.split("-").last
 RUBY_COMPAT_VERSION = TRAVELING_RB_VERSION.split(".").first(2).join(".") + ".0"
 RUBY_MAJOR_VERSION = TRAVELING_RB_VERSION.split(".").first.to_i
 RUBY_MINOR_VERSION = TRAVELING_RB_VERSION.split(".")[1].to_i
+BUNDLER_VERSION = "2.7.2"
 PLUGIN_CLI_VERSION = "0.1.3" # https://github.com/pact-foundation/pact-plugins/releases
 MOCK_SERVER_CLI_VERSION = "1.0.6" # https://github.com/pact-foundation/pact-core-mock-server/releases
 VERIFIER_CLI_VERSION = "1.2.0" # https://github.com/pact-foundation/pact-reference/releases
@@ -126,10 +127,17 @@ def create_package(version, source_target, package_target, os_type)
   sh "mkdir #{package_dir}/lib/vendor/.bundle"
   sh "cp packaging/bundler-config #{package_dir}/lib/vendor/.bundle/config"
 
-  if package_target.include? 'windows'
-    sh "sed -i.bak '41s/^/#/' #{package_dir}/lib/ruby/lib/ruby/#{RUBY_COMPAT_VERSION}/bundler/stub_specification.rb"
-  else
-    sh "sed -i.bak '41s/^/#/' #{package_dir}/lib/ruby/lib/ruby/site_ruby/#{RUBY_COMPAT_VERSION}/bundler/stub_specification.rb"
+  # Patch all copies of Bundler's stub_specification.rb to prevent gems with
+  # missing native extensions from being ignored (Bundler 2.7.2 raises GemNotFound).
+  # Making ignored? always return false lets Bundler activate the gem and lets Ruby
+  # fall back to the runtime's built-in .so for default gems (json, fiddle, io-console).
+  stub_spec_files = [
+    "#{package_dir}/lib/ruby/lib/ruby/site_ruby/#{RUBY_COMPAT_VERSION}/bundler/stub_specification.rb",
+    "#{package_dir}/lib/ruby/lib/ruby/#{RUBY_COMPAT_VERSION}/bundler/stub_specification.rb",
+    "#{package_dir}/lib/ruby/lib/ruby/gems/#{RUBY_COMPAT_VERSION}/gems/bundler-#{BUNDLER_VERSION}/lib/bundler/stub_specification.rb",
+  ]
+  stub_spec_files.each do |f|
+    sh "sed -i.bak '39s/return false unless @ignored/return false/' #{f}" if File.exist?(f)
   end
   remove_unnecessary_files package_dir
 
