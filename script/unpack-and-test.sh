@@ -10,11 +10,11 @@ FILE_EXT=${FILE_EXT:-}
 if [ "$BINARY_OS" == "" ] || [ "$BINARY_ARCH" == "" ] ; then 
     case ${detected_os} in
     'Darwin arm64')
-        BINARY_OS=osx
+        BINARY_OS=macos
         BINARY_ARCH=arm64
         ;;
     'Darwin x86' | 'Darwin x86_64' | "Darwin"*)
-        BINARY_OS=osx
+        BINARY_OS=macos
         BINARY_ARCH=x86_64
         ;;
     "Linux aarch64"* | "Linux arm64"*)
