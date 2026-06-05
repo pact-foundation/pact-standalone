@@ -214,16 +214,17 @@ def remove_unnecessary_files package_dir
   sh "find #{package_dir}/lib/vendor/ruby -name 'Gemfile.lock' | xargs rm -f"
 
   # Uncommonly used encodings
-  sh "rm -f #{package_dir}/lib/ruby/lib/ruby/*/*/enc/cp949*"
-  sh "rm -f #{package_dir}/lib/ruby/lib/ruby/*/*/enc/euc_*"
-  sh "rm -f #{package_dir}/lib/ruby/lib/ruby/*/*/enc/shift_jis*"
-  sh "rm -f #{package_dir}/lib/ruby/lib/ruby/*/*/enc/koi8_*"
-  sh "rm -f #{package_dir}/lib/ruby/lib/ruby/*/*/enc/emacs*"
-  sh "rm -f #{package_dir}/lib/ruby/lib/ruby/*/*/enc/gb*"
-  sh "rm -f #{package_dir}/lib/ruby/lib/ruby/*/*/enc/big5*"
-  # sh "rm -f #{package_dir}/lib/ruby/lib/ruby/*/*/enc/windows*"
-  # sh "rm -f #{package_dir}/lib/ruby/lib/ruby/*/*/enc/utf_16*"
-  # sh "rm -f #{package_dir}/lib/ruby/lib/ruby/*/*/enc/utf_32*"
+  # Use -rf to handle .dSYM directories present in macOS Ruby 3.4+ builds
+  sh "rm -rf #{package_dir}/lib/ruby/lib/ruby/*/*/enc/cp949*"
+  sh "rm -rf #{package_dir}/lib/ruby/lib/ruby/*/*/enc/euc_*"
+  sh "rm -rf #{package_dir}/lib/ruby/lib/ruby/*/*/enc/shift_jis*"
+  sh "rm -rf #{package_dir}/lib/ruby/lib/ruby/*/*/enc/koi8_*"
+  sh "rm -rf #{package_dir}/lib/ruby/lib/ruby/*/*/enc/emacs*"
+  sh "rm -rf #{package_dir}/lib/ruby/lib/ruby/*/*/enc/gb*"
+  sh "rm -rf #{package_dir}/lib/ruby/lib/ruby/*/*/enc/big5*"
+  # sh "rm -rf #{package_dir}/lib/ruby/lib/ruby/*/*/enc/windows*"
+  # sh "rm -rf #{package_dir}/lib/ruby/lib/ruby/*/*/enc/utf_16*"
+  # sh "rm -rf #{package_dir}/lib/ruby/lib/ruby/*/*/enc/utf_32*"
 end
 
 def generate_readme
