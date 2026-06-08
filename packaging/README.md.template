@@ -135,6 +135,20 @@ To connect to a Pact Broker that uses custom SSL cerificates, set the environmen
 
 ## Troubleshooting
 
+### Deprecation warning
+
+All CLI tools in this package print the following deprecation warning to `$stderr` on every invocation:
+
+```
+WARN: This CLI is deprecated and no longer receiving updates. We recommend you upgrade to the latest CLI: https://docs.pact.io/implementation_guides/cli
+```
+
+To suppress this warning (e.g. in automated/programmatic usage), set the environment variable:
+
+```
+PACT_DISABLE_DEPRECATION_WARNINGS=true
+```
+
 ### SSL
 
 To connect to a Pact Broker that uses custom SSL certificates, set the environment variable `$SSL_CERT_FILE` or `$SSL_CERT_DIR` to a path that contains the appropriate certificate.
