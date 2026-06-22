@@ -104,6 +104,7 @@ def create_package(version, source_target, package_target, os_type)
   sh "mkdir -p #{package_dir}/bin"
   sh "cp build/README.md #{package_dir}"
   sh "cp packaging/pact*.rb #{package_dir}/lib/app"
+  sh "cp VERSION #{package_dir}/lib/app/"
 
   # sh "cp -pR lib #{package_dir}/lib/app"
   sh "mkdir #{package_dir}/lib/ruby"

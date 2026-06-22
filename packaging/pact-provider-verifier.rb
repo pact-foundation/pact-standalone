@@ -18,6 +18,7 @@ if ENV['ORIG_SSL_CERT_FILE'] && ENV['ORIG_SSL_CERT_FILE'] != ''
 end
 
 require 'pact/provider_verifier/cli/verify'
+require_relative 'pact_standalone_user_agent'
 
 class Thor
   module Base
