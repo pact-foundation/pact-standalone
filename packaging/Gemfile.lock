@@ -91,7 +91,7 @@ GEM
       thor (>= 0.20, < 2.0)
     parslet (2.0.0)
     rack (3.2.6)
-    rack-proxy (0.8.2)
+    rack-proxy (0.8.3)
       rack
     rack-reverse-proxy-pact (1.0.2)
       rack (>= 3.0, < 4.0)
@@ -152,7 +152,7 @@ DEPENDENCIES
   fiddle (= 1.1.6)
   io-console (= 0.8.1)
   json (= 2.19.8)
-  pact (< 2)
+  pact (< 3)
   pact-message (= 0.11.1)
   pact-mock_service (= 3.12.4)
   pact-provider-verifier (= 1.39.1)
