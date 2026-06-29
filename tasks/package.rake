@@ -195,6 +195,8 @@ def remove_unnecessary_files package_dir
   sh "rm -f #{package_dir}/lib/vendor/ruby/*/gems/*/ext/Makefile"
   sh "rm -f #{package_dir}/lib/vendor/ruby/*/gems/*/ext/*/Makefile"
   sh "rm -f #{package_dir}/lib/vendor/ruby/*/gems/*/ext/*/tmp"
+  sh "find #{package_dir}/lib/vendor/ruby/*/extensions -name '*.so' | xargs rm -f"
+  sh "find #{package_dir}/lib/vendor/ruby/*/extensions -name '*.bundle' | xargs rm -f"
   sh "find #{package_dir}/lib/vendor/ruby -name '*.c' | xargs rm -f"
   sh "find #{package_dir}/lib/vendor/ruby -name '*.cpp' | xargs rm -f"
   sh "find #{package_dir}/lib/vendor/ruby -name '*.h' | xargs rm -f"
