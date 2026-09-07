@@ -30,7 +30,7 @@ GEM
     logger (1.7.0)
     mini_mime (1.1.5)
     mize (0.6.1)
-    multi_json (1.21.1)
+    multi_json (1.21.2)
     multi_xml (0.9.1)
       bigdecimal (>= 3.1, < 5)
     net-http (0.9.1)
