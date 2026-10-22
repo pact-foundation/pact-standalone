@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 ruby:3.4.11-alpine@sha256:ae2f369670fbf93cc819f299d56af471db6e2223f05268a04fa3fa8b21d8fb65
+FROM --platform=linux/amd64 ruby:3.4.11-alpine@sha256:964cc9931ae515b7b4e0822f6d88e0c5e33a92033a024b242f52a0c08dd1c4cb
 
 # Installation path
 ENV HOME=/app
