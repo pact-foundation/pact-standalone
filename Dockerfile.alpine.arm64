@@ -1,4 +1,4 @@
-FROM arm64v8/alpine@sha256:cc99de154757eb3d8b9200868d0bab96bff581a4f3000e62caed7baf46b41f95
+FROM arm64v8/alpine@sha256:f7bad8ce534a6d96ba2d3e7d7b53fb1171aea384eccd61005d92f61d32e384b2
 
 WORKDIR ../
 
