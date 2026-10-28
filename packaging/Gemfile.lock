@@ -23,7 +23,7 @@ GEM
       csv
       mini_mime (>= 1.0.0)
       multi_xml (>= 0.5.2)
-    io-console (0.9.4)
+    io-console (0.9.5)
     json (3.1.0)
     jsonpath (1.1.5)
       multi_json
@@ -151,7 +151,7 @@ PLATFORMS
 DEPENDENCIES
   bigdecimal (= 3.1.8)
   fiddle (= 1.1.6)
-  io-console (= 0.9.4)
+  io-console (= 0.9.5)
   json (= 3.1.0)
   pact (< 3)
   pact-message (= 0.11.1)
