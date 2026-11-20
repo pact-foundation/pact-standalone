@@ -19,7 +19,7 @@ jobs:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
     - uses: ruby/setup-ruby@f9c4492e86def3e644ab32a0ef185eda5b0c20d0 # v1.342.0
       with:
-        ruby-version: 3.4.12
+        ruby-version: 3.4.13
     - name: Set up environment
       run: bundle install
     - name: Build
