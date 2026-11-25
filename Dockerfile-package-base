@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 ruby:3.4.13-slim@sha256:2139ce9a85d720a874952570ae8537a506cb31737155fd6baf62cf2f3fdca7ee
+FROM --platform=linux/amd64 ruby:3.4.13-slim@sha256:f038b6952ce49d4d7bcbe2a6c194299f5c70b45fc6d9f9fec4798c4c0f61aed3
 
 RUN apt-get update && apt-get install -y \
     curl \
